@@ -25,23 +25,29 @@ from tkinter.filedialog import asksaveasfilename, askopenfilename
 import pandas as pd
 from flask import Flask,jsonify
 from flask_restful import Resource, Api, reqparse
+from capture2 import basler_camera
 
 app = Flask(__name__)
 
-@app.route('/start', methods=['POST'])
+# @app.route('/start', methods=['GET'])
 def start():
     bluetooth.write(b's')
-    nex()
+    # nex()
     return jsonify({'message': 'Start command sent.'})
+
+@app.route('/basler_camera', methods=['GET'])
+def call_capture():
+    basler_camera()
 
 # @app.route('/nex', methods=['POST'])
 def nex():
     bluetooth.write(b'h')
     return jsonify({'message': 'Nex command sent.'})
 
-@app.route('/first_frame', methods=['POST'])
+@app.route('/first_frame', methods=['GET'])
 def first_frame():
     bluetooth.write(b'b')
+    # nex()
     List_position.append("Second_frame")
     return jsonify({'message': 'First frame command sent.'})
 
@@ -52,12 +58,12 @@ def on_origin():
     List_position.append("origin")
     return jsonify({'message': 'On origin command sent.'})
 
-@app.route('/on_closing', methods=['POST'])
-def on_closing():
-    k.withdraw()
-    bluetooth.write(b's')
-    nex()
-    quit()
+# @app.route('/on_closing', methods=['POST'])
+# def on_closing():
+#     # k.withdraw()
+#     bluetooth.write(b's')
+#     nex()
+#     quit()
 
 # @app.route('/arduino', methods=['GET'])
 def arduino():
@@ -72,5 +78,7 @@ def arduino():
 if __name__ == '__main__':
     arduino()
     app.run()
+    # start()
+    
 
     

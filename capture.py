@@ -1,28 +1,82 @@
-from fileinput import filename
-import os
-import subprocess
-from turtle import bgcolor
 from unittest import main
 import cv2
 from PIL import Image
-import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
-import tkinter as tk
-from tkinter import ttk
+from PIL import Image
 from tkinter import *
 from re import L
 import tkinter as tk
-from tkinter import ttk
 from tkinter import *
 from PIL import ImageTk,Image   
-import time
-import tkinter.font as font
-import serial
 from pypylon import pylon
-import shutil
-import math
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 import pandas as pd
+# from marks import *
+from origin import *
+
+
+def Merging():
+    
+    rot4 = cv2.imread(Img1_path)
+    #img1_rot = cv2.rotate(rot4, cv2.cv2.ROTATE_90_CLOCKWISE)
+    #cv2.imwrite("Delete/1.jpg", img1_rot)
+    rot = cv2.imread(Img2_path)
+    #img2_rot = cv2.rotate(rot, cv2.cv2.ROTATE_90_CLOCKWISE)
+    #image1_rotation = cv2.rotate(src, cv2.cv2.ROTATE_90_CLOCKWISE)
+
+    np_img = np.array(rot)
+
+    #h1,w1 = np_img.shape[:2]
+    #print (h1,w1)
+
+    np_img_del = np.delete(np_img,np.s_[0:435],axis=0)
+    #h2,w2 = np_img_del.shape[:2]
+
+    cv2.imwrite("Delete/2.jpg", np_img_del)
+   
+    #im = cv2.imread('Delete/1.jpg')
+    result = rot4[:,72:]
+
+    y1 = cv2.imread('Delete/2.jpg')
+    result1 = y1[:, :-72]
+
+    im_h1_rot = np.vstack((result1,result))
+
+    #print (h2,w2)
+    
+    #concatenate image 1 image 2
+    #im_h1 = cv2.hconcat([img1_rot,np_img_del])
+    #im_h1_rot = cv2.rotate(im_h1, cv2.cv2.ROTATE_90_COUNTERCLOCKWISE)
+    cv2.imwrite("Delete/concat.jpg", im_h1_rot)
+    myimage=ImageTk.PhotoImage(Image.open("Delete/concat.jpg").resize((548,768)))
+    final_image=Label(Frame1, image=myimage)
+    final_image.myimage=myimage
+    final_image.grid(row=0,column=0)
+    
+def Final_Merge():
+    IMG1 = cv2.imread("Delete/1.jpg")
+    img1_rot = cv2.rotate(IMG1, cv2.ROTATE_90_CLOCKWISE)
+
+    IMG2 = cv2.imread("Delete/2.jpg")
+    img2_rot = cv2.rotate(IMG2, cv2.ROTATE_90_CLOCKWISE)
+
+    np_img = np.array(img2_rot)
+
+    h1,w1 = np_img.shape[:2]
+    #print (h1,w1)
+
+    np_img_del = np.delete(np_img,np.s_[0:435],axis=1)
+
+    h2,w2 = np_img_del.shape[:2]
+    #print (h2,w2)
+
+    #concatenate image 1 image 2
+    im_h1 = cv2.hconcat([img1_rot,np_img_del])
+    im_h1_rot = cv2.rotate(im_h1, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    cv2.imwrite("Delete/concat_Final.jpg", im_h1_rot)
+    myimage=ImageTk.PhotoImage(Image.open("Delete/concat_Final.jpg").resize((548,768)))
+    final_image=Label(Frame2, image=myimage)
+    final_image.myimage=myimage
+    final_image.grid(row=0,column=0)
 
 def basler_camera():
     global Img1_path, Img2_path

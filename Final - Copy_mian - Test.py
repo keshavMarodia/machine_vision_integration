@@ -26,7 +26,7 @@ from tkinter.filedialog import asksaveasfilename, askopenfilename
 import pandas as pd
 
 # from marks import *
-from origin import *
+# from origin import *
 
 #--------------------------------------------------------------------Starting-------------------------------------------------------------------------
 Reference_line1 = 2855
@@ -56,31 +56,31 @@ def initial():
         shutil.rmtree("Captured_images/Capture")
         os.mkdir("Captured_images/Capture")
         
-# def Arduino():
-#     global port, List_position, bluetooth
-#     port="COM10" #This will be different for various devices and on windows it will probably be a COM port.
-#     bluetooth=serial.Serial(port, 9600) #Start communications with the bluetooth unit
-#     #print("Connected")
-#     bluetooth.flushInput() #This gives the bluetooth a little kick
-#     List_position = ['origin']
+def Arduino():
+    global port, List_position, bluetooth
+    port="COM10" #This will be different for various devices and on windows it will probably be a COM port.
+    bluetooth=serial.Serial(port, 9600) #Start communications with the bluetooth unit
+    #print("Connected")
+    bluetooth.flushInput() #This gives the bluetooth a little kick
+    List_position = ['origin']
 # -------------------------------------------------------------------commands--------------------------------------------------------------------------
-# def start():
-#     bluetooth.write(b's')#These need to be bytes not unicode, plus a number NO = Red, NC = Orange
-#     nex()                                                                                                                                           
-# def nex():    
-#     bluetooth.write(b'h')#These need to be bytes not unicode, plus a number NO = Red, NC = Orange
-# def first_frame():
-#      bluetooth.write(b'b')#These need to be bytes not unicode, plus a number
-#      List_position.append("Second_frame")
-# def on_origin():
-#     bluetooth.write(b"s")
-#     nex() 
-#     List_position.append("origin")   #origin button function 
-# def on_closing():
-#      k.withdraw()
-#      bluetooth.write(b"s")#These need to be bytes not unicode, plus a number
-#      nex()
-#      quit()
+def start():
+    bluetooth.write(b's')#These need to be bytes not unicode, plus a number NO = Red, NC = Orange
+    nex()                                                                                                                                           
+def nex():    
+    bluetooth.write(b'h')#These need to be bytes not unicode, plus a number NO = Red, NC = Orange
+def first_frame():
+     bluetooth.write(b'b')#These need to be bytes not unicode, plus a number
+     List_position.append("Second_frame")
+def on_origin():
+    bluetooth.write(b"s")
+    nex() 
+    List_position.append("origin")   #origin button function 
+def on_closing():
+     k.withdraw()
+     bluetooth.write(b"s")#These need to be bytes not unicode, plus a number
+     nex()
+     quit()
 #-------------------------------------------------------------------GUI-------------------------------------------------------------------------------  
 def GUI():
     global L1, var,r
