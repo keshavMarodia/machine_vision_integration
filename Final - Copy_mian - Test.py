@@ -847,10 +847,11 @@ def table_Marks():
             
         else:
             Final_dim.append(Final_Dimension2_list[i])
+            
+            print(Final_dim)  #possible data source
 
     for i in range(len(flatList)):
-        my_game.insert(parent='',index='end',iid=i,text='',
-        values=(i+1, flatList[i],Final_dim[i],Final_Dimension3_list[i], 'Yes'))
+        my_game.insert(parent='',index='end',iid=i,text='',values=(i+1, flatList[i],Final_dim[i],Final_Dimension3_list[i], 'Yes'))
         print(flatList[i],Final_dim[i],Final_Dimension3_list[i])
 
     my_game.pack() 

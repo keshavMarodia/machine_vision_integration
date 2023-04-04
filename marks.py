@@ -1,10 +1,10 @@
 import subprocess
 import cv2
 import numpy as np
-from tkinter import *
-from tkinter import *
-from control_page import *
 
+
+Reference_line1 = 2855
+Reference_line2 = 317
 
 def Marks():
     global Centers,  Final_Dimension, Final_Dimension1, Final_Dimension3, straight, Curve,Final_Dimension1_list,Final_Dimension2_list,Final_Dimension3_list, m,Centers_final,flatList
@@ -154,7 +154,78 @@ def Marks():
             cv2.imwrite("Delete/1.jpg", img)
         else:
             cv2.imwrite("Delete/2.jpg", img)
+   
     flatList = [ item for elem in Centers_final for item in elem]
     Final_Dimension2_list,Final_Dimension3_list,flatList=[list(v) for v in zip(*sorted(zip(Final_Dimension2_list,Final_Dimension3_list,flatList)))]
     Final_Merge()
-    table_Marks()       
+    # table_Marks() 
+    
+def bars():
+    global Bar1, Bar2,Two_images_bars 
+    Two_images_bars = []
+
+    for m in range (1,3):
+        imagepath = "Captured_images/Capture/Image" + str(m) + ".jpg"
+        for i in range(1):
+            print("yes")
+            subprocess.run(f"python Yolo_Bars/detect.py --weights {'Yolo_Bars/best.pt'} --source {imagepath} --img {'512'} --iou {'0.1'} --conf {'0.5'}")
+            print("No")
+
+        img = cv2.imread(imagepath)
+        array_created = np.full((3288, 4608, 3), 255, dtype = np.uint8)
+
+        f = open("Coordinates/coordinates_Bars.txt","r")
+
+        Bars_ref = []
+
+        lines = [line.rstrip() for line in f]
+
+        for i in range(len(lines)):
+            string = lines[i]
+            lst = string.split(',')
+            Dist_x = round((int(lst[2]) - int(lst[0]))/2) 
+            Dist_y = round((int(lst[3]) - int(lst[1]))/2)
+
+            center_x = int(lst[0]) + (Dist_x)
+            center_y = int(lst[1]) + (Dist_y)
+            Bars_ref.append(center_x)
+            
+        if len(Bars_ref) == 1:
+            # Label(second_frame, text = "One Bar Identified", bg = 'orange').grid(row = 6 , column = 5, sticky = 'W', padx = 10, pady = 0)
+            break
+        else:
+            try:
+                Bar1 = min(Bars_ref) + round(53/2)
+                Two_images_bars.append(Bar1)
+                Bar2 = max(Bars_ref) - round(53/2)
+                Two_images_bars.append(Bar2)
+            except:
+                # Label(second_frame, text = "No Bars Identified", bg = 'orange').grid(row = 6 , column = 5, sticky = 'W', padx = 10, pady = 0)
+                break 
+    
+
+def Final_Merge():
+    IMG1 = cv2.imread(r"Delete/1.jpg")
+    img1_rot = cv2.rotate(IMG1, cv2.ROTATE_90_CLOCKWISE)
+
+    IMG2 = cv2.imread(r"Delete/2.jpg")
+    img2_rot = cv2.rotate(IMG2, cv2.ROTATE_90_CLOCKWISE)
+
+    np_img = np.array(img2_rot)
+
+    h1,w1 = np_img.shape[:2]
+    #print (h1,w1)
+
+    np_img_del = np.delete(np_img,np.s_[0:435],axis=1)
+
+    h2,w2 = np_img_del.shape[:2]
+    #print (h2,w2)
+
+    #concatenate image 1 image 2
+    im_h1 = cv2.hconcat([img1_rot,np_img_del])
+    im_h1_rot = cv2.rotate(im_h1, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    cv2.imwrite(r"Delete/concat_Final.jpg", im_h1_rot)
+    # myimage=ImageTk.PhotoImage(Image.open(r"college-project\src\components\Delete\concat_Final.jpg").resize((548,768)))
+    # final_image=Label(Frame2, image=myimage)
+    # final_image.myimage=myimage
+    # final_image.grid(row=0,column=0)   

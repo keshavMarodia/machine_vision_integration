@@ -28,6 +28,7 @@ import pandas as pd
 # from origin import *
 
 def basler_camera():
+    # List_position = ['origin']
     global Img1_path, Img2_path
 
     # conecting to the first available camera
@@ -60,20 +61,21 @@ def basler_camera():
                 image = converter.Convert(grabResult)
                 img = image.GetArray()
                 #cv2.namedWindow('Live Camera', cv2.WINDOW_NORMAL)
-                # if List_position[-1] == 'origin':
-            Img1_path = r"Captured_images\Capture\Image1.jpg"
-            cv2.imwrite(Img1_path, img)
-            # myimage=ImageTk.PhotoImage(Image.open(Img1_path).resize((548,384)))
-            # final_image=Label(Frame1, image=myimage)
-            # final_image.myimage=myimage
-            # final_image.grid(row=5,column=0, pady=350)
-            # break
-                # else:
-            Img2_path = r"Captured_images\Capture\Image2.jpg"
-            cv2.imwrite(Img2_path, img)
-            Merging()
-            # break                      
-        
+                if List_position[-1] == 'origin':
+                    Img1_path = r"Captured_images\Capture\Image1.jpg"
+                    cv2.imwrite(Img1_path, img)
+                    myimage=ImageTk.PhotoImage(Image.open(Img1_path).resize((548,384)))
+                    final_image=Label(Frame1, image=myimage)
+                    final_image.myimage=myimage
+                    final_image.grid(row=5,column=0, pady=350)
+                    break
+                else:
+                    Img2_path = r"Captured_images\Capture\Image2.jpg"
+                    cv2.imwrite(Img2_path, img)
+                    Merging()
+
+                    break                      
+             
             grabResult.Release()
             
         # Releasing the resource    

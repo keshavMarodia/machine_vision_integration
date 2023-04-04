@@ -22,13 +22,14 @@ import serial
 from pypylon import pylon
 import shutil
 import math
+import json
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 import pandas as pd
 
 from origin import *
 from holes import *
 from torque import *
-from marks import *
+# from marks import *
 
 #--------------------------------------------------------------------Starting-------------------------------------------------------------------------
 Reference_line1 = 2855
@@ -492,12 +493,14 @@ def excel():
         Sort = Name_Count.sort_values(by='Center X')
     Sort.insert(0, 'ID', range(1, 1 + len(Sort)))
     Final1 = Sort.drop(['Count', 'Length',], axis=1)
+    json_object = Final1.to_json(orient='records')
     
 
     excel_frame = Frame(second_frame)
     excel_frame.grid(row=4, column = 3, padx = 10, pady = 10)
     # Create a Treeview widget
     tree = ttk.Treeview(excel_frame)
+    return json.dumps(json_object)
     
     open_file()
 def open_file():
