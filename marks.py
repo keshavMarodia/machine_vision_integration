@@ -8,6 +8,7 @@ Reference_line2 = 317
 
 def Marks():
     global Centers,  Final_Dimension, Final_Dimension1, Final_Dimension3, straight, Curve,Final_Dimension1_list,Final_Dimension2_list,Final_Dimension3_list, m,Centers_final,flatList
+    global marksTable
     bars()
     
     Centers_final = []
@@ -49,9 +50,9 @@ def Marks():
         erosion = cv2.erode(dst1,kernel,iterations = 1)
 
         imagem = cv2.bitwise_not(erosion)
-        cv2.imwrite('Delete/INVERT.jpg', imagem)
+        cv2.imwrite(r'college-project\src\components\images\INVERT.jpg', imagem)
 
-        image_final = cv2.imread('Delete/INVERT.jpg')
+        image_final = cv2.imread(r'college-project\src\components\images\INVERT.jpg')
 
         gray = cv2.cvtColor(image_final, cv2.COLOR_BGR2GRAY)
 
@@ -151,14 +152,15 @@ def Marks():
             cv2.putText(img, "C"+ str(s), (coordinates[i]),cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 255), 10)
             s +=1
         if m == 1:
-            cv2.imwrite("Delete/1.jpg", img)
+            cv2.imwrite(r'college-project\src\components\images\1.jpg', img)
         else:
-            cv2.imwrite("Delete/2.jpg", img)
+            cv2.imwrite(r'college-project\src\components\images\2.jpg', img)
    
     flatList = [ item for elem in Centers_final for item in elem]
     Final_Dimension2_list,Final_Dimension3_list,flatList=[list(v) for v in zip(*sorted(zip(Final_Dimension2_list,Final_Dimension3_list,flatList)))]
     Final_Merge()
-    # table_Marks() 
+    marksTable= table_Marks() 
+    return marksTable
     
 def bars():
     global Bar1, Bar2,Two_images_bars 
@@ -205,10 +207,10 @@ def bars():
     
 
 def Final_Merge():
-    IMG1 = cv2.imread(r"Delete/1.jpg")
+    IMG1 = cv2.imread(r"college-project\src\components\images\1.jpg")
     img1_rot = cv2.rotate(IMG1, cv2.ROTATE_90_CLOCKWISE)
 
-    IMG2 = cv2.imread(r"Delete/2.jpg")
+    IMG2 = cv2.imread(r"college-project\src\components\images\2.jpg")
     img2_rot = cv2.rotate(IMG2, cv2.ROTATE_90_CLOCKWISE)
 
     np_img = np.array(img2_rot)
@@ -224,8 +226,28 @@ def Final_Merge():
     #concatenate image 1 image 2
     im_h1 = cv2.hconcat([img1_rot,np_img_del])
     im_h1_rot = cv2.rotate(im_h1, cv2.ROTATE_90_COUNTERCLOCKWISE)
-    cv2.imwrite(r"Delete/concat_Final.jpg", im_h1_rot)
+    cv2.imwrite(r"college-project\src\components\images\concat_Final.jpg", im_h1_rot)
     # myimage=ImageTk.PhotoImage(Image.open(r"college-project\src\components\Delete\concat_Final.jpg").resize((548,768)))
     # final_image=Label(Frame2, image=myimage)
     # final_image.myimage=myimage
     # final_image.grid(row=0,column=0)   
+    
+def table_Marks():
+    print(flatList)
+    
+    Final_dim = []
+    Final_data = []
+    for i in range(len(Final_Dimension2_list)):
+        if Final_Dimension2_list[i] <= 35:
+            Final = Final_Dimension2_list[i] #- 0.5
+            Final_dim.append(Final)
+            
+        else:
+            Final_dim.append(Final_Dimension2_list[i])
+    global values
+    for i in range(len(flatList)):
+        values=(i+1, flatList[i],Final_dim[i],Final_Dimension3_list[i], 'Yes')
+        Final_data.append(values)
+        print(flatList[i],Final_dim[i],Final_Dimension3_list[i])
+
+    return Final_data

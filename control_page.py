@@ -26,9 +26,9 @@ import json
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 import pandas as pd
 
-from origin import *
-from holes import *
-from torque import *
+# from origin import *
+# from holes import *
+# from torque import *
 # from marks import *
 
 #--------------------------------------------------------------------Starting-------------------------------------------------------------------------
@@ -69,21 +69,25 @@ def Arduino():
 # -------------------------------------------------------------------commands--------------------------------------------------------------------------
 def start():
     bluetooth.write(b's')#These need to be bytes not unicode, plus a number NO = Red, NC = Orange
-    nex()                                                                                                                                           
+    nex()
+                                                                                                                                               
 def nex():    
     bluetooth.write(b'h')#These need to be bytes not unicode, plus a number NO = Red, NC = Orange
+    
 def first_frame():
-     bluetooth.write(b'b')#These need to be bytes not unicode, plus a number
-     List_position.append("Second_frame")
+    bluetooth.write(b'b')#These need to be bytes not unicode, plus a number
+    List_position.append("Second_frame")
+     
 def on_origin():
     bluetooth.write(b"s")
     nex() 
     List_position.append("origin")   #origin button function 
+    
 def on_closing():
-     k.withdraw()
-     bluetooth.write(b"s")#These need to be bytes not unicode, plus a number
-     nex()
-     quit()
+    k.withdraw()
+    bluetooth.write(b"s")#These need to be bytes not unicode, plus a number
+    nex()
+    quit()
 #-------------------------------------------------------------------GUI-------------------------------------------------------------------------------  
 def GUI():
     global L1, var,r
@@ -208,7 +212,7 @@ def files():
     global pic, csv_path
     second_frame.filename=askopenfilename(defaultextension="Cad Drawings",title="Choose a file",filetypes=[("png files","*.png"),("jpg files","*.jpg")])
     pic=second_frame.filename
-    csv_path = os.path.splitext(pic)[0]
+    csv_path = os.path.splitext(pic)[0] 
     
 
     excel()
@@ -496,11 +500,13 @@ def excel():
     json_object = Final1.to_json(orient='records')
     
 
-    excel_frame = Frame(second_frame)
-    excel_frame.grid(row=4, column = 3, padx = 10, pady = 10)
-    # Create a Treeview widget
-    tree = ttk.Treeview(excel_frame)
-    return json.dumps(json_object)
+    # excel_frame = Frame(second_frame)
+    # excel_frame.grid(row=4, column = 3, padx = 10, pady = 10)
+    # # Create a Treeview widget
+    # tree = ttk.Treeview(excel_frame)
+    
+    
+    json.dumps(json_object)
     
     open_file()
 def open_file():
@@ -522,10 +528,10 @@ def open_file():
     tree.pack() 
 def clear_treeview():
    tree.delete(*tree.get_children())
-#----------------------------------------------------------------Start with---------------------------------------------------------------------------
-initial()
-Arduino()
-GUI()
+# #----------------------------------------------------------------Start with---------------------------------------------------------------------------
+# initial()
+# Arduino()
+# GUI()
 
 
 

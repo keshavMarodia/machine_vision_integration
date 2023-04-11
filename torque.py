@@ -1,31 +1,34 @@
-from control_page import *
-from fileinput import filename
-import os
 import subprocess
-from turtle import bgcolor
-from unittest import main
 import cv2
-from PIL import Image
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
-import tkinter as tk
-from tkinter import ttk
-from tkinter import *
-from re import L
-import tkinter as tk
-from tkinter import ttk
-from tkinter import *
-from PIL import ImageTk,Image   
-import time
-import tkinter.font as font
-import serial
-from pypylon import pylon
-import shutil
-import math
-from tkinter.filedialog import asksaveasfilename, askopenfilename
-import pandas as pd
-from control_page import Final_Merge
 
+Reference_line1 = 2855
+Reference_line2 = 317
+
+
+def Final_Merge():
+    IMG1 = cv2.imread(r"college-project\src\components\images\1.jpg")
+    img1_rot = cv2.rotate(IMG1, cv2.ROTATE_90_CLOCKWISE)
+
+    IMG2 = cv2.imread(r"college-project\src\components\images\2.jpg")
+    img2_rot = cv2.rotate(IMG2, cv2.ROTATE_90_CLOCKWISE)
+
+    np_img = np.array(img2_rot)
+
+    h1,w1 = np_img.shape[:2]
+    #print (h1,w1)
+
+    np_img_del = np.delete(np_img,np.s_[0:435],axis=1)
+
+    h2,w2 = np_img_del.shape[:2]
+    #print (h2,w2)
+
+    #concatenate image 1 image 2
+    im_h1 = cv2.hconcat([img1_rot,np_img_del])
+    im_h1_rot = cv2.rotate(im_h1, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    cv2.imwrite(r"college-project\src\components\images\concat_Final.jpg", im_h1_rot)
+    
+    
 def Torque():
 
     s=1
@@ -70,7 +73,7 @@ def Torque():
             cv2.putText(array_created, "T{s}:", (lines[0]+20, lines[1]-20),cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 255), 10)
             s +=1
         if m == 1:
-            cv2.imwrite("Delete/1.jpg", array_created)
+            cv2.imwrite(r'college-project\src\components\images\1.jpg', array_created)
         else:
-            cv2.imwrite("Delete/2.jpg", array_created)
+            cv2.imwrite(r'college-project\src\components\images\2.jpg', array_created)
     Final_Merge()

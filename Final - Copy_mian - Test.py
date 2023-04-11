@@ -906,7 +906,7 @@ def table_Holes():
         else:
             Final_dim.append(Final_Dimension2_list[i])
 
-
+    global values
 
     for i in range(len(flatList)):
         my_game.insert(parent='',index='end',iid=i,text='',

@@ -1,75 +1,15 @@
-from control_page import *
-
-from fileinput import filename
-import os
 import subprocess
-from turtle import bgcolor
-from unittest import main
 import cv2
-from PIL import Image
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
-import tkinter as tk
-from tkinter import ttk
-from tkinter import *
-from re import L
-import tkinter as tk
-from tkinter import ttk
-from tkinter import *
-from PIL import ImageTk,Image   
-import time
-import tkinter.font as font
-import serial
-from pypylon import pylon
-import shutil
-import math
-from tkinter.filedialog import asksaveasfilename, askopenfilename
-import pandas as pd
+
+Reference_line1 = 2855
+Reference_line2 = 317
 
 
 def table_Holes():
-    game_frame = Frame(second_frame)
-        
-    game_frame.grid(row=5, column = 3, sticky = 'W', padx = 10, pady = 10)
-
-    my_game = ttk.Treeview(game_frame, show = 'headings', height=10)
-
-
-
-    verscrlbar = ttk.Scrollbar(game_frame, orient ="vertical", command = my_game.yview)
-    verscrlbar.pack(side ='right', fill ='x')
-    # Calling pack method w.r.to vertical
-    # scrollbar
-    
-
-    # Configuring treeview
-    my_game.configure(xscrollcommand = verscrlbar.set)   
-    my_game.pack()
-
-    my_game['columns'] = ('S_No', 'Center_ID', 'Reference1', 'Reference3', 'Diameter', 'Approval_state')
-
-    # format our column
-    my_game.column("#0", width=0,  stretch=NO)
-    my_game.column("S_No",anchor=CENTER,width=40)
-    my_game.column("Center_ID",anchor=CENTER,width=40)
-    my_game.column("Reference1",anchor=CENTER,width=130)
-    #my_game.column("Reference2",anchor=CENTER,width=130)
-    my_game.column("Reference3",anchor=CENTER,width=150)
-    my_game.column("Diameter",anchor=CENTER,width=70)
-    my_game.column("Approval_state",anchor=CENTER,width=70)
-
-    #Create Headings 
-    my_game.heading("#0",text="",anchor=CENTER)
-    my_game.heading("S_No",text="ID",anchor=CENTER)
-    my_game.heading("Center_ID",text="ID",anchor=CENTER)
-    my_game.heading("Reference1",text="Center_X",anchor=CENTER)
-    #my_game.heading("Reference2",text="Horizontal_Reference2",anchor=CENTER)
-    my_game.heading("Reference3",text="Center_Y",anchor=CENTER)
-    my_game.heading("Diameter",text="Diameter",anchor=CENTER)
-    my_game.heading("Approval_state",text="Approval",anchor=CENTER)
-
 
     Final_dim = []
+    Final_data = []
     for i in range(len(Final_Dimension2_list)):
         if Final_Dimension2_list[i] <= 35:
             Final = Final_Dimension2_list[i] #- 0.5
@@ -78,11 +18,79 @@ def table_Holes():
         else:
             Final_dim.append(Final_Dimension2_list[i])
 
-
+    global values
 
     for i in range(len(flatList)):
-        my_game.insert(parent='',index='end',iid=i,text='',
-        values=(i+1, flatList[i],Final_dim[i],Final_Dimension3_list[i], (Diameter_List[i]), 'Yes'))
+        values=(i+1, flatList[i],Final_dim[i],Final_Dimension3_list[i],Diameter_List[i], 'Yes')
+        Final_data.append(values)
+
+    return values
+
+
+def Final_Merge():
+    IMG1 = cv2.imread(r"college-project\src\components\images\1.jpg")
+    img1_rot = cv2.rotate(IMG1, cv2.ROTATE_90_CLOCKWISE)
+
+    IMG2 = cv2.imread(r"college-project\src\components\images\2.jpg")
+    img2_rot = cv2.rotate(IMG2, cv2.ROTATE_90_CLOCKWISE)
+
+    np_img = np.array(img2_rot)
+
+    h1,w1 = np_img.shape[:2]
+    #print (h1,w1)
+
+    np_img_del = np.delete(np_img,np.s_[0:435],axis=1)
+
+    h2,w2 = np_img_del.shape[:2]
+    #print (h2,w2)
+
+    #concatenate image 1 image 2
+    im_h1 = cv2.hconcat([img1_rot,np_img_del])
+    im_h1_rot = cv2.rotate(im_h1, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    cv2.imwrite(r"college-project\src\components\images\concat_Final.jpg", im_h1_rot)
+    
+def bars():
+    global Bar1, Bar2,Two_images_bars 
+    Two_images_bars = []
+
+    for m in range (1,3):
+        imagepath = "Captured_images/Capture/Image" + str(m) + ".jpg"
+        for i in range(1):
+            print("yes")
+            subprocess.run(f"python Yolo_Bars/detect.py --weights {'Yolo_Bars/best.pt'} --source {imagepath} --img {'512'} --iou {'0.1'} --conf {'0.5'}")
+            print("No")
+
+        img = cv2.imread(imagepath)
+        array_created = np.full((3288, 4608, 3), 255, dtype = np.uint8)
+
+        f = open("Coordinates/coordinates_Bars.txt","r")
+
+        Bars_ref = []
+
+        lines = [line.rstrip() for line in f]
+
+        for i in range(len(lines)):
+            string = lines[i]
+            lst = string.split(',')
+            Dist_x = round((int(lst[2]) - int(lst[0]))/2) 
+            Dist_y = round((int(lst[3]) - int(lst[1]))/2)
+
+            center_x = int(lst[0]) + (Dist_x)
+            center_y = int(lst[1]) + (Dist_y)
+            Bars_ref.append(center_x)
+            
+        if len(Bars_ref) == 1:
+            #Label(second_frame, text = "One Bar Identified", bg = 'orange').grid(row = 6 , column = 5, sticky = 'W', padx = 10, pady = 0)
+            break
+        else:
+            try:
+                Bar1 = min(Bars_ref) + round(53/2)
+                Two_images_bars.append(Bar1)
+                Bar2 = max(Bars_ref) - round(53/2)
+                Two_images_bars.append(Bar2)
+            except:
+                #Label(second_frame, text = "No Bars Identified", bg = 'orange').grid(row = 6 , column = 5, sticky = 'W', padx = 10, pady = 0)
+                break 
         
 def Holes():
     global Centers,  Final_Dimension, Final_Dimension1, Final_Dimension3, straight, Curve,Final_Dimension1_list,Final_Dimension2_list,Final_Dimension3_list,m, Centers_final,flatList, Diameter_List
@@ -130,9 +138,9 @@ def Holes():
         erosion = cv2.erode(dst1,kernel,iterations = 1)
 
         imagem = cv2.bitwise_not(erosion)
-        cv2.imwrite('Delete/INVERT.jpg', imagem)
+        cv2.imwrite(r'college-project\src\components\images\INVERT.jpg', imagem)
 
-        image_final = cv2.imread('Delete/INVERT.jpg')
+        image_final = cv2.imread(r'college-project\src\components\images\INVERT.jpg')
 
         gray = cv2.cvtColor(image_final, cv2.COLOR_BGR2GRAY)
 
@@ -259,10 +267,13 @@ def Holes():
             cv2.putText(img, "C"+ str(s), (coordinates[i]),cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 255), 10)
             s +=1
         if m == 1:
-            cv2.imwrite("Delete/1.jpg", img)
+            cv2.imwrite(r'college-project\src\components\images\1.jpg', img)
         else:
-            cv2.imwrite("Delete/2.jpg", img)
+            cv2.imwrite(r'college-project\src\components\images\2.jpg', img)
     flatList = [ item for elem in Centers_final for item in elem]
     Final_Dimension2_list,Final_Dimension3_list,flatList, Diameter_List=[list(v) for v in zip(*sorted(zip(Final_Dimension2_list,Final_Dimension3_list,flatList,Diameter_List)))]
+    
+    
     Final_Merge()
-    table_Holes()
+    holestables = table_Holes()
+    return holestables

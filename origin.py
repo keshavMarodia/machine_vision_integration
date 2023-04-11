@@ -24,21 +24,26 @@ import math
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 import pandas as pd
 from flask import Flask,jsonify
+from flask_cors import CORS
 from flask_restful import Resource, Api, reqparse
+import json
 # from capture2 import Merging
-from marks import Marks
-from control_page import excel
-
-
-
+from marks import Marks,table_Marks
+from holes import Holes
+# from control_page import excel
 
 app = Flask(__name__)
+CORS(app)
 
 # @app.route('/start', methods=['GET'])
 def start():
     bluetooth.write(b's')
     # nex()
     return jsonify({'message': 'Start command sent.'})
+
+@app.route('/fetchphoto1', methods=['GET'])
+def fetchphoto1():
+    return cv2.imread('')
 
 @app.route('/basler_camera', methods=['GET'])
 def basler_camera():
@@ -116,12 +121,12 @@ def Merging():
     np_img_del = np.delete(np_img,np.s_[0:435],axis=0)
     #h2,w2 = np_img_del.shape[:2]
 
-    cv2.imwrite(r"college-project\src\components\Delete\2.jpg", np_img_del)
+    cv2.imwrite(r"college-project\src\components\images\2.jpg", np_img_del)
    
     #im = cv2.imread('Delete/1.jpg')
     result = rot4[:,72:]
 
-    y1 = cv2.imread(r'college-project\src\components\Delete\2.jpg')
+    y1 = cv2.imread(r'college-project\src\components\images\2.jpg')
     result1 = y1[:, :-72]
 
     im_h1_rot = np.vstack((result1,result))
@@ -131,7 +136,7 @@ def Merging():
     #concatenate image 1 image 2
     #im_h1 = cv2.hconcat([img1_rot,np_img_del])
     #im_h1_rot = cv2.rotate(im_h1, cv2.cv2.ROTATE_90_COUNTERCLOCKWISE)
-    cv2.imwrite(r"college-project\src\components\Delete\concat.jpg", im_h1_rot)
+    cv2.imwrite(r"college-project\src\components\images\concat.jpg", im_h1_rot)
     # myimage=ImageTk.PhotoImage(Image.open("Delete/concat.jpg").resize((548,768)))
     # final_image=Label(Frame1, image=myimage)
     # final_image.myimage=myimage
@@ -156,14 +161,28 @@ def on_origin():
     List_position.append("origin")
     return jsonify({'message': 'On origin command sent.'})
 
-@app.route('/process' , methods=['GET'])
-def process():
-    Marks()
-    return jsonify({'message': 'Process finished'})
+@app.route('/marking' , methods=['GET'])
+def marks():
+    tableMarks = Marks()
+    return json.dumps(tableMarks)
+
+@app.route('/holes' , methods=['GET'])
+def holes():
+    holes = Holes()
+    return json.dumps(holes)
 
 @app.route('/reference_table' , methods=['GET'])
 def reference_table():
-    return excel()
+    global Final1
+    data= pd.read_csv(r"C:\Users\ASUS\Desktop\Section_1.csv")
+    Name_Count = data.query('Name=="Point"')
+    Sort = Name_Count.sort_values(by='Position X')
+    Sort.insert(0, 'ID', range(1, 1 + len(Sort)))
+    Final1 = Sort.drop(['Count', 'Length',], axis=1)
+    json_object = Final1.to_json(orient='records')
+    return json.dumps(json_object)
+    
+   
     
 
 # @app.route('/on_closing', methods=['POST'])
@@ -184,7 +203,7 @@ def arduino():
     # return jsonify({'message': 'Arduino function executed.'})
 
 if __name__ == '__main__':
-    # arduino()
+    arduino()
     app.run()
     # start()
     
